@@ -1,12 +1,20 @@
 package main
 
 import (
-	"fmt"
-
+	"github.com/c1rno/idempotencer/cmd/debug"
 	_ "github.com/confluentinc/confluent-kafka-go/kafka"
+	_ "github.com/jackc/pgx/v4"
+	"github.com/spf13/cobra"
 	_ "github.com/zeromq/goczmq"
 )
 
+var root = &cobra.Command{}
+
 func main() {
-	fmt.Println("Working!")
+	root.AddCommand(
+		debug.Command,
+	)
+	if err := root.Execute(); err != nil {
+		panic(err)
+	}
 }

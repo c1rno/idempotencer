@@ -2,7 +2,7 @@ include deployments/Makefile
 
 NAME=idempotencer
 IMAGE=c1rno/$(NAME):latest
-BASE_CMD=bash
+CMD=debug
 CC=go
 
 image:
@@ -11,10 +11,10 @@ image:
 		-f deployments/Dockerfile \
 		.
 
-dev-shell: image
+dev-run: image
 	docker run -it --rm \
 		--name $(NAME) \
-		$(IMAGE) $(BASE_CMD)
+		$(IMAGE) $(CMD)
 
 vendor:
 	$(CC) mod tidy && $(CC) mod download
@@ -25,6 +25,7 @@ test:
 build:
 	CGO_LDFLAGS="-lzmq -lczmq -luuid -lpthread -lsodium -lrt -lstdc++ -lm -lc -lgcc" \
 	$(CC) build -v -o $(NAME) \
+	-mod=readonly \
 	-ldflags '-extldflags "-static"' \
 	-tags 'netgo std static_all' \
 	./main.go

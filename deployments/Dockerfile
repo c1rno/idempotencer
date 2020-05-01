@@ -6,16 +6,20 @@ ENV LD_RUN_PATH "/usr/local/lib"
 
 WORKDIR /go/src/idempotencer
 
-COPY ./deployments/Makefile .
+COPY ./deployments/Makefile ./deployments/Makefile
 
-RUN make docker-install-dependencies
-RUN make docker-install-rd-kafka
-RUN make docker-install-libzmq
-RUN make docker-install-czmq
+RUN make -C deployments docker-install-dependencies
+RUN make -C deployments docker-install-rd-kafka
+RUN make -C deployments docker-install-libzmq
+RUN make -C deployments docker-install-czmq
+
+COPY ./Makefile ./go.mod ./go.sum .
+RUN make vendor
 
 COPY . .
-RUN make vendor && make build
+RUN make build
 
 FROM c1rno/scratch:1.0
-COPY --from=builder /go/src/idempotencer/idempotencer /bin/idempotencer
+COPY --from=builder /go/src/idempotencer/idempotencer /bin/
+COPY --from=builder /go/src/idempotencer/deployments/default-config.yaml /etc/idempotencer/
 ENTRYPOINT ["/bin/idempotencer"]
