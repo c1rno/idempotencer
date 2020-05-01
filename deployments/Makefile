@@ -39,8 +39,7 @@ docker-install-rd-kafka:
 docker-install-libzmq:
 	git clone https://github.com/zeromq/libzmq.git --depth 1 --branch $(LIB_ZMQ)
 	cd libzmq && ./autogen.sh
-	cd libzmq && ./configure --disable-shared --enable-static --with-libsodium \
-		LDFLAGS="-lzmq -lpthread -lsodium -lrt -lstdc++ -lm -lc -lgcc"
+	cd libzmq && ./configure --disable-shared --enable-static --with-libsodium
 	$(MAKE) -C libzmq install
 	cd libzmq && ldconfig
 	rm -rf libzmq
@@ -48,7 +47,7 @@ docker-install-libzmq:
 docker-install-czmq:
 	git clone https://github.com/zeromq/czmq.git --depth 1 --branch $(LIB_CZMQ)
 	cd czmq && ./autogen.sh
-	cd czmq && ./configure
+	cd czmq && ./configure --disable-shared --enable-static
 	$(MAKE) -C czmq install
 	cd czmq && ldconfig
 	rm -rf czmq

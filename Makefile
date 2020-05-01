@@ -23,7 +23,7 @@ test:
 	$(CC) test -v ./...
 
 build:
-	# CGO_LDFLAGS="-lzmq -lpthread -lsodium -lrt -lstdc++ -lm -lc -lgcc" \
+	CGO_LDFLAGS="-lzmq -lczmq -luuid -lpthread -lsodium -lrt -lstdc++ -lm -lc -lgcc" \
 	$(CC) build -v -o $(NAME) \
 	-ldflags '-extldflags "-static"' \
 	-tags 'netgo std static_all' \
