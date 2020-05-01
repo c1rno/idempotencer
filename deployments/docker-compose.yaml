@@ -1,0 +1,15 @@
+version: "3.7"
+services:
+
+  idempotencer-dev:
+    container_name: idempotencer-dev
+    hostname: idempotencer-dev
+    restart: on-failure
+    build:
+      context: ./../
+      dockerfile: deployments/Dockerfile
+    networks:
+      - idempotencer
+
+networks:
+  idempotencer:
