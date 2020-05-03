@@ -7,3 +7,9 @@ There may be alternatives in the future to change persistent storage.
 
 ## Rules
 	- Prefer internal `errors.Error` over standart `error`-interface
+
+
+## Not miss with link
+
+https://pkg.go.dev/github.com/pebbe/zmq4?tab=doc#pkg-overview
+

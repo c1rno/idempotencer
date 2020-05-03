@@ -1,4 +1,4 @@
-package consumer
+package upstream
 
 type Config struct {
 }

@@ -1,3 +1,18 @@
-LogLevel: 0
-MetricsSocket: ":8888"
+LogLevel: 0 # debug
+
+Metrics:
+  HealthCheckRoute: "/healthcheck"
+  MetricsRoute: "/metrics"
+  Socket: "0.0.0.0:8888"
+
+QueueConsumer:
+  Socket: "tcp://idempotencer-broker:8887"
+
+QueueProducer:
+  Socket: "tcp://idempotencer-broker:8886"
+
+QueueBroker:
+  InSocket:  "tcp://0.0.0.0:8886"
+  OutSocket: "tcp://0.0.0.0:8887"
+
 

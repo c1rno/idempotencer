@@ -1,4 +1,4 @@
-packge dto
+package dto
 
 type Data []byte
 

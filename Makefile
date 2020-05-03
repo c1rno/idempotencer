@@ -21,6 +21,11 @@ dev-down:
 vendor:
 	$(CC) mod tidy && $(CC) mod download
 
+check:
+	gofmt -w .
+	goimports -w .
+	# TODO: add golangci-lint
+
 test:
 	$(CC) test -v ./...
 

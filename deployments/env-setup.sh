@@ -3,9 +3,9 @@
 set -euxo pipefail
 
 mkdir /etc/idempotencer
-cp /go/src/app/deployments/default-config.yaml /etc/idempotencer/
+ln -s /go/src/app/deployments/default-config.yaml /etc/idempotencer/
 
-make vendor
+# make vendor
 
 tail -F /dev/null
 

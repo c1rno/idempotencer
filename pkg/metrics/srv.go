@@ -1,10 +1,10 @@
 package metrics
 
 import (
-	"fmt"
-	"sync"
 	"context"
+	"fmt"
 	"net/http"
+	"sync"
 
 	"github.com/c1rno/idempotencer/pkg/errors"
 	"github.com/c1rno/idempotencer/pkg/logging"
@@ -12,33 +12,31 @@ import (
 )
 
 const (
-	OK               = "OK"
-	metricsRoute     = "/metrics"
-	healthCheckRoute = "/healthcheck"
+	OK = "OK"
 )
 
 type (
-	Checker func() errors.Error
+	Checker  func() errors.Error
 	Shutdown func(context.Context) errors.Error
 )
 
-func RunMetricsSrv(socket string, checker Checker, logger logging.Logger) Shutdown {
-	http.Handle(metricsRoute, promhttp.Handler())
+func RunMetricsSrv(conf Config, checker Checker, logger logging.Logger) Shutdown {
+	http.Handle(conf.MetricsRoute, promhttp.Handler())
 	http.Handle(
-		healthCheckRoute,
+		conf.HealthCheckRoute,
 		HealthCheckHandler{
 			fn:  checker,
 			log: logger,
 		},
 	)
-	srv := &http.Server{Addr: socket}
+	srv := &http.Server{Addr: conf.Socket}
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		logger.Info("Run metrics srv", map[string]interface{}{
-			"health-check-route": socket + healthCheckRoute,
-			"metrics-route":      socket + metricsRoute,
+			"health-check-route": conf.Socket + conf.HealthCheckRoute,
+			"metrics-route":      conf.Socket + conf.MetricsRoute,
 		})
 		err := srv.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
@@ -51,11 +49,11 @@ func RunMetricsSrv(socket string, checker Checker, logger logging.Logger) Shutdo
 			)
 		}
 		logger.Info("Shutdown metrics srv", map[string]interface{}{
-			"health-check-route": socket + healthCheckRoute,
-			"metrics-route":      socket + metricsRoute,
+			"health-check-route": conf.Socket + conf.HealthCheckRoute,
+			"metrics-route":      conf.Socket + conf.MetricsRoute,
 		})
 	}()
-	return func (ctx context.Context) errors.Error {
+	return func(ctx context.Context) errors.Error {
 		err := srv.Shutdown(ctx)
 		wg.Wait()
 		if err != nil {
