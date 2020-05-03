@@ -11,10 +11,11 @@ import (
 )
 
 type Config struct {
-	LogLevel    int
-	Consumer    consumer.Config
-	Producer    producer.Config
-	Persistence persistence.Config
+	LogLevel      int
+	MetricsSocket string
+	Consumer      consumer.Config
+	Producer      producer.Config
+	Persistence   persistence.Config
 }
 
 func NewConfig(l logging.Logger) (c Config, err error) {

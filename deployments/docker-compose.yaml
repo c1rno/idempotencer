@@ -1,13 +1,20 @@
 version: "3.7"
 services:
 
-  idempotencer-dev:
-    container_name: idempotencer-dev
-    hostname: idempotencer-dev
+  idempotencer:
+    container_name: idempotencer
+    hostname: idempotencer
+    image: c1rno/idempotencer
+    command: ./deployments/env-setup.sh
     build:
       context: ./../
-      image: c1rno/idempotencer
+      target: builder
       dockerfile: deployments/Dockerfile
+    environment:
+      CGO_LDFLAGS: "-lzmq -lczmq -luuid -lpthread -lsodium -lrt -lstdc++ -lm -lc -lgcc"
+    volumes: [../:/go/src/app]
+    working_dir: /go/src/app
+    ports: ["8888:8888"]
     networks: &net
       - idempotencer
     depends_on:

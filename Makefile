@@ -11,10 +11,12 @@ image:
 		-f deployments/Dockerfile \
 		.
 
-dev-run: image
-	docker run -it --rm \
-		--name $(NAME) \
-		$(IMAGE) $(CMD)
+dev-env:
+	docker-compose -f deployments/docker-compose.yaml up -d
+	docker exec -it idempotencer bash
+
+dev-down:
+	docker-compose -f deployments/docker-compose.yaml down
 
 vendor:
 	$(CC) mod tidy && $(CC) mod download

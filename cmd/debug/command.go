@@ -2,9 +2,12 @@ package debug
 
 import (
 	"fmt"
+	"context"
 
 	"github.com/c1rno/idempotencer/pkg/config"
 	"github.com/c1rno/idempotencer/pkg/logging"
+	"github.com/c1rno/idempotencer/pkg/metrics"
+	"github.com/c1rno/idempotencer/pkg/errors"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/spf13/cobra"
 )
@@ -24,5 +27,8 @@ var Command = &cobra.Command{
 			"err": err,
 		})
 		logger = logging.NewLogger(conf.LogLevel)
+
+		shutdown := metrics.RunMetricsSrv(conf.MetricsSocket, func() errors.Error {return nil}, logger)
+		err = shutdown(context.Background())
 	},
 }

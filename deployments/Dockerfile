@@ -13,13 +13,17 @@ RUN make -C deployments docker-install-rd-kafka
 RUN make -C deployments docker-install-libzmq
 RUN make -C deployments docker-install-czmq
 
-COPY ./Makefile ./go.mod ./go.sum .
+COPY ./Makefile ./go.mod ./go.sum ./
 RUN make vendor
 
 COPY . .
 RUN make build
 
 FROM c1rno/scratch:1.0
+
 COPY --from=builder /go/src/idempotencer/idempotencer /bin/
 COPY --from=builder /go/src/idempotencer/deployments/default-config.yaml /etc/idempotencer/
+
+EXPOSE 8888
+
 ENTRYPOINT ["/bin/idempotencer"]

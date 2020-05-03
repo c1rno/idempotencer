@@ -6,6 +6,7 @@ import (
 	_ "github.com/jackc/pgx/v4"
 	"github.com/spf13/cobra"
 	_ "github.com/zeromq/goczmq"
+	_ "github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var root = &cobra.Command{}
