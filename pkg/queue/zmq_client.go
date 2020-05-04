@@ -91,6 +91,10 @@ func (c *client) Pull() (d dto.Msg, err errors.Error) {
 	}()
 	msg, serr := c.sock.RecvMessage(zmq.DONTWAIT)
 	if serr != nil {
+		if serr.Error() == unavailable {
+			err = errors.NewError(errors.PullSocketNotReadyError, serr)
+			return
+		}
 		err = helpers.NewErrWithLog(c.log, errors.PullSocketError, serr)
 		return
 	}

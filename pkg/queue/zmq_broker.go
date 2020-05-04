@@ -10,8 +10,9 @@ import (
 )
 
 const (
-	proto            = "tcp://"
-	READY = "\001" //  Signals worker is ready
+	proto       = "tcp://"
+	unavailable = "resource temporarily unavailable"
+	READY       = "\001" //  Signals worker is ready
 )
 
 func NewBroker(conf BrokerConfig, logger logging.Logger) Broker {

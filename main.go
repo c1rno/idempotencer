@@ -5,10 +5,6 @@ import (
 	"github.com/c1rno/idempotencer/cmd/downstream"
 	"github.com/c1rno/idempotencer/cmd/migrate"
 	"github.com/c1rno/idempotencer/cmd/upstream"
-	_ "github.com/confluentinc/confluent-kafka-go/kafka"
-	_ "github.com/jackc/pgx/v4"
-	_ "github.com/pebbe/zmq4"
-	_ "github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
 )
 

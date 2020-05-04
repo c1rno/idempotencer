@@ -9,7 +9,9 @@ There may be alternatives in the future to change persistent storage.
 	- Prefer internal `errors.Error` over standart `error`-interface
 
 
-## Not miss with link
+## TODO
 
 https://pkg.go.dev/github.com/pebbe/zmq4?tab=doc#pkg-overview
+
+See how to configure hight water mark (or it not needed in my schema)
 

@@ -5,7 +5,7 @@ type Msg interface {
 	Data() []string
 }
 
-func NewRawMsg(s... string) Msg {
+func NewRawMsg(s ...string) Msg {
 	return raw(s)
 }
 
