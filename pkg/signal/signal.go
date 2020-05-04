@@ -11,6 +11,7 @@ import (
 func WaitShutdown(logger logging.Logger) {
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGTERM, syscall.SIGINT)
-	<-ch
-	logger.Info("Shutdown", nil)
+	logger.Info("Shutdown", map[string]interface{}{
+		"sig": <-ch,
+	})
 }

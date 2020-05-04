@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/c1rno/idempotencer/cmd/broker"
-	"github.com/c1rno/idempotencer/cmd/debug"
 	"github.com/c1rno/idempotencer/cmd/downstream"
 	"github.com/c1rno/idempotencer/cmd/migrate"
 	"github.com/c1rno/idempotencer/cmd/upstream"
@@ -18,7 +17,6 @@ var root = &cobra.Command{}
 func main() {
 	root.AddCommand(
 		broker.Command,
-		debug.Command,
 		downstream.Command,
 		migrate.Command,
 		upstream.Command,

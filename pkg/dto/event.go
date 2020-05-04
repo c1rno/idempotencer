@@ -1,8 +1,16 @@
 package dto
 
-type Data []byte
+type Msg interface {
+	// over one frame sending it?
+	Data() []string
+}
 
-type Event struct {
-	Meta interface{}
-	Data Data
+func NewRawMsg(s... string) Msg {
+	return raw(s)
+}
+
+type raw []string
+
+func (p raw) Data() []string {
+	return p
 }

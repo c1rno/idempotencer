@@ -15,23 +15,22 @@ type Config struct {
 	LogLevel      int
 	Metrics       metrics.Config
 	Upstream      upstream.Config
-	QueueConsumer queue.ConsumerConfig
-	QueueProducer queue.ProducerConfig
+	QueueConsumer queue.ClientConfig
+	QueueProducer queue.ClientConfig
 	QueueBroker   queue.BrokerConfig
 	Persistence   persistence.Config
 }
 
-func NewConfig(l logging.Logger) (c Config, err error) {
+func NewConfig(l logging.Logger) (c Config, terr errors.Error) {
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("default-config")
 	viper.AddConfigPath("/etc/idempotencer")
-	if err = viper.ReadInConfig(); err != nil {
-		l.Error(errors.NewError(errors.ConfigReadingError, err).String(), nil)
+	if err := viper.ReadInConfig(); err != nil {
+		terr = errors.NewError(errors.ConfigReadingError, err)
 	}
 	viper.AutomaticEnv()
-	err = viper.Unmarshal(&c)
-	if err != nil {
-		err = errors.NewError(errors.ConfigUnmarshallError, err)
+	if err := viper.Unmarshal(&c); err != nil {
+		terr = errors.NewError(errors.ConfigUnmarshallError, err)
 	}
-	return c, err
+	return
 }

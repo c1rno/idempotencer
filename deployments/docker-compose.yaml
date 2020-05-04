@@ -12,60 +12,61 @@ services:
       dockerfile: deployments/Dockerfile
     environment:
       CGO_LDFLAGS: "-lzmq -lczmq -luuid -lpthread -lsodium -lrt -lstdc++ -lm -lc -lgcc"
+      GODEBUG: asyncpreemptoff=1 # https://pkg.go.dev/github.com/pebbe/zmq4?tab=doc#pkg-overview
     volumes: [../:/go/src/app]
     working_dir: /go/src/app
     # ports: ["8888:8888"]
     networks: &net
       - idempotencer
-    depends_on:
-      - postgres
-      - kafka
+    # depends_on:
+    #   - postgres
+    #   - kafka
 
-  idempotencer-2:
-    <<: *template
-    container_name: idempotencer-2
-    hostname: idempotencer-2
+  # idempotencer-2:
+  #   <<: *template
+  #   container_name: idempotencer-2
+  #   hostname: idempotencer-2
 
-  idempotencer-broker:
-    <<: *template
-    container_name: idempotencer-broker
-    hostname: idempotencer-broker
+  # idempotencer-3:
+  #   <<: *template
+  #   container_name: idempotencer-3
+  #   hostname: idempotencer-3
 
-  postgres:
-    networks: *net
-    container_name: postgres
-    hostname: postgres
-    image: postgres:12.2
-    environment:
-      - POSTGRES_DB=main
-      - POSTGRES_USER=root
-      - POSTGRES_PORT=5432
-      - POSTGRES_HOST_AUTH_METHOD=trust
-    healthcheck:
-      test: "pg_isready -U main"
+  # postgres:
+  #   networks: *net
+  #   container_name: postgres
+  #   hostname: postgres
+  #   image: postgres:12.2
+  #   environment:
+  #     - POSTGRES_DB=main
+  #     - POSTGRES_USER=root
+  #     - POSTGRES_PORT=5432
+  #     - POSTGRES_HOST_AUTH_METHOD=trust
+  #   healthcheck:
+  #     test: "pg_isready -U main"
 
-  kafka:
-    networks: *net
-    container_name: kafka
-    hostname: kafka
-    image: wurstmeister/kafka:2.12-2.4.1
-    restart: on-failure
-    volumes: [/var/run/docker.sock:/var/run/docker.sock]
-    depends_on: [zookeeper]
-    environment:
-      KAFKA_ADVERTISED_HOST_NAME: kafka
-      KAFKA_ADVERTISED_PORT: 9092
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-    healthcheck:
-      test: "nc -z localhost 9092"
+  # kafka:
+  #   networks: *net
+  #   container_name: kafka
+  #   hostname: kafka
+  #   image: wurstmeister/kafka:2.12-2.4.1
+  #   restart: on-failure
+  #   volumes: [/var/run/docker.sock:/var/run/docker.sock]
+  #   depends_on: [zookeeper]
+  #   environment:
+  #     KAFKA_ADVERTISED_HOST_NAME: kafka
+  #     KAFKA_ADVERTISED_PORT: 9092
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+  #   healthcheck:
+  #     test: "nc -z localhost 9092"
 
-  zookeeper:
-    networks: *net
-    container_name: zookeeper
-    hostname: zookeeper
-    image: wurstmeister/zookeeper:3.4.6
-    healthcheck:
-      test: "nc -z localhost 2181"
+  # zookeeper:
+  #   networks: *net
+  #   container_name: zookeeper
+  #   hostname: zookeeper
+  #   image: wurstmeister/zookeeper:3.4.6
+  #   healthcheck:
+  #     test: "nc -z localhost 2181"
 
 networks:
   idempotencer:

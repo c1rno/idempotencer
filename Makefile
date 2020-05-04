@@ -16,7 +16,7 @@ dev-env:
 	docker exec -it idempotencer bash
 
 dev-down:
-	docker-compose -f deployments/docker-compose.yaml down
+	docker-compose -f deployments/docker-compose.yaml down --remove-orphans
 
 vendor:
 	$(CC) mod tidy && $(CC) mod download
@@ -31,6 +31,7 @@ test:
 
 build:
 	CGO_LDFLAGS="-lzmq -lczmq -luuid -lpthread -lsodium -lrt -lstdc++ -lm -lc -lgcc" \
+	GODEBUG=asyncpreemptoff=1 \
 	$(CC) build -v -o $(NAME) \
 	-mod=readonly \
 	-ldflags '-extldflags "-static"' \

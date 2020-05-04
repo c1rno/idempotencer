@@ -6,13 +6,13 @@ Metrics:
   Socket: "0.0.0.0:8888"
 
 QueueConsumer:
-  Socket: "tcp://idempotencer-broker:8887"
+  Socket: "idempotencer:8887"
 
 QueueProducer:
-  Socket: "tcp://idempotencer-broker:8886"
+  Socket: "idempotencer:8886"
 
 QueueBroker:
-  InSocket:  "tcp://0.0.0.0:8886"
-  OutSocket: "tcp://0.0.0.0:8887"
+  InSocket:  "0.0.0.0:8886"
+  OutSocket: "0.0.0.0:8887"
 
 
