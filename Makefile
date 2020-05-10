@@ -22,9 +22,8 @@ vendor:
 	$(CC) mod tidy && $(CC) mod download
 
 check:
-	gofmt -w .
-	goimports -w .
-	# TODO: add golangci-lint
+	goimports -w -e .
+	go vet ./... # TODO: replace by golangci-lint
 
 test:
 	$(CC) test -v ./...

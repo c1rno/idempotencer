@@ -1,6 +1,8 @@
 package queue
 
 import (
+	stdErrors "errors"
+
 	"github.com/c1rno/idempotencer/pkg/dto"
 	"github.com/c1rno/idempotencer/pkg/errors"
 	"github.com/c1rno/idempotencer/pkg/helpers"
@@ -44,7 +46,11 @@ func (c *client) Connect() errors.Error {
 	defer c.log.Info("Connected", c.conf.ToLoggerCtx())
 
 	if c.conf.Socket == "" {
-		return helpers.NewErrWithLog(c.log, errors.InvalidConfiguration, nil)
+		return helpers.NewErrWithLog(
+			c.log,
+			errors.InvalidConfiguration,
+			stdErrors.New("destination socket not defined"),
+		)
 	}
 
 	var err error
@@ -73,7 +79,7 @@ func (c *client) Push(s dto.Msg) (err errors.Error) {
 		return
 	}
 	logCtx := c.conf.ToLoggerCtx()
-	logCtx["data"] = s
+	logCtx["data"] = s.String()
 	c.log.Debug("Send", logCtx)
 	return
 }
@@ -98,8 +104,9 @@ func (c *client) Pull() (d dto.Msg, err errors.Error) {
 		err = helpers.NewErrWithLog(c.log, errors.PullSocketError, serr)
 		return
 	}
+	ret := dto.NewStringMsg(msg...)
 	logCtx := c.conf.ToLoggerCtx()
-	logCtx["data"] = msg
+	logCtx["data"] = ret.String()
 	c.log.Debug("Received", logCtx)
-	return dto.NewRawMsg(msg...), err
+	return ret, err
 }

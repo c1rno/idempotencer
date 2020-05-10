@@ -11,11 +11,11 @@ var errorsMap = map[int]errMapVal{
 	CloseSocketFail:             {msg: "Can't close socket"},
 	NewReqSocketCreationFail:    {msg: "Can't create new REQ socket"},
 	ConnectSocketFail:           {msg: "Can't connect socket"},
-	PullSocketError:             {msg: "Pull socket err", fatal: true},
-	PushSocketError:             {msg: "Push socket err"},
-	ReactorError:                {msg: "Reactor error"},
+	PullSocketError:             {msg: "Pull socket error", fatal: true},
+	PushSocketError:             {msg: "Push socket error"},
+	LoadBalancerError:           {msg: "LoadBalancer start error"},
 	InvalidConfiguration:        {msg: "Required configuration is missed or invalid"},
-	PullSocketNotReadyError:     {msg: "Pull socket err, try later"},
+	PullSocketNotReadyError:     {msg: "Pull socket error, try later"},
 }
 
 const (
@@ -31,7 +31,7 @@ const (
 	ConnectSocketFail
 	PullSocketError
 	PushSocketError
-	ReactorError
+	LoadBalancerError
 	InvalidConfiguration
 	PullSocketNotReadyError
 )

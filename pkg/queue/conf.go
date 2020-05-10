@@ -12,11 +12,13 @@ func (b BrokerConfig) ToLoggerCtx() map[string]interface{} {
 }
 
 type ClientConfig struct {
-	Socket string
+	Socket   string
+	Identity string
 }
 
 func (c ClientConfig) ToLoggerCtx() map[string]interface{} {
 	return map[string]interface{}{
+		"identity": c.Identity,
 		"destination": c.Socket,
 	}
 }

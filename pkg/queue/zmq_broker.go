@@ -12,6 +12,7 @@ import (
 const (
 	proto       = "tcp://"
 	unavailable = "resource temporarily unavailable"
+	incorrectState = "incorrect protocol state"
 	READY       = "\001" //  Signals worker is ready
 )
 
@@ -84,7 +85,7 @@ func (b *simpleLoadBalancer) Start() errors.Error {
 	)
 	b.log.Info("Broker started", b.conf.ToLoggerCtx())
 	if err = b.reactor.Run(-1); err != nil {
-		return helpers.NewErrWithLog(b.log, errors.ReactorError, err)
+		return helpers.NewErrWithLog(b.log, errors.LoadBalancerError, err)
 	}
 	return nil
 }

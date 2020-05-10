@@ -6,13 +6,13 @@ import (
 )
 
 const (
-	errField = "err"
+	ErrField = "err"
 )
 
 func NewErrWithLog(l logging.Logger, c int, e error) errors.Error {
 	t := errors.NewError(c, e)
 	l.Error(t.Error(), map[string]interface{}{
-		errField: t,
+		ErrField: t,
 	})
 	return t
 }

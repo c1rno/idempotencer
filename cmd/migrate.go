@@ -1,4 +1,4 @@
-package migrate
+package cmd
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var Command = &cobra.Command{
+var MigrateCommand = &cobra.Command{
 	Use:   `migrate`,
 	Short: `Setup persistence layer schema`,
 	Run: func(cmd *cobra.Command, args []string) {

@@ -1,4 +1,4 @@
-package downstream
+package nanomsg
 
 import (
 	"fmt"
@@ -8,46 +8,36 @@ import (
 	"github.com/c1rno/idempotencer/pkg/errors"
 	"github.com/c1rno/idempotencer/pkg/helpers"
 	"github.com/c1rno/idempotencer/pkg/queue"
-	_ "github.com/pebbe/zmq4"
 	"github.com/spf13/cobra"
 )
 
-var Command = &cobra.Command{
-	Use:   `downstream`,
-	Short: `Simple kafka consumer, produces events into 0MQ broker`,
+var UpstreamCmd = &cobra.Command{
+	Use:   `upstream`,
+	Short: `Simple kafka consumer, produces events into Nanomsg broker`,
 	Run: func(cmd *cobra.Command, args []string) {
 		setup, err := InitialSetup()
 		helpers.Panicer(err)
 		defer setup.Waiter()
 
 		setup.Wg.Add(2)
-		client := queue.NewClient(setup.Conf.QueueConsumer, setup.Log)
+		client := queue.NewMangosClient(setup.Conf.QueueProducer, setup.Log)
 		go func() {
 			<-setup.Ctx.Done()
 			helpers.Panicer(client.Disconnect())
 			setup.Wg.Done()
 		}()
 		go func() {
-			var (
-				err errors.Error
-				msg dto.Msg
-			)
+			var err errors.Error
 			helpers.Panicer(client.Connect())
-			err = client.Push(dto.NewRawMsg(queue.READY))
-			for err != nil && setup.Ctx.Err() == nil {
-				err = client.Push(dto.NewRawMsg(queue.READY))
-			}
 			id := helpers.UniqIdentity()
 			i := 0
 			for setup.Ctx.Err() == nil {
 				i += 1
-				msg, err = client.Pull()
+				err = client.Push(dto.NewStringMsg(fmt.Sprintf("upstream-%s: %d", id, i)))
 				if err == nil {
-					tmp := msg.Data()
-					tmp[len(tmp)-1] = fmt.Sprintf("downstream-%s: %d", id, i)
-					err = client.Push(dto.NewRawMsg(tmp...))
+					_, err = client.Pull()
 					for err != nil && setup.Ctx.Err() == nil {
-						err = client.Push(dto.NewRawMsg(tmp...))
+						_, err = client.Pull()
 					}
 				}
 			}

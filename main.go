@@ -1,10 +1,9 @@
 package main
 
 import (
-	"github.com/c1rno/idempotencer/cmd/broker"
-	"github.com/c1rno/idempotencer/cmd/downstream"
-	"github.com/c1rno/idempotencer/cmd/migrate"
-	"github.com/c1rno/idempotencer/cmd/upstream"
+	"github.com/c1rno/idempotencer/cmd"
+
+	// _ "github.com/jackc/pgx/v4"
 	"github.com/spf13/cobra"
 )
 
@@ -12,10 +11,10 @@ var root = &cobra.Command{}
 
 func main() {
 	root.AddCommand(
-		broker.Command,
-		downstream.Command,
-		migrate.Command,
-		upstream.Command,
+		cmd.MigrateCommand,
+		cmd.NanomsgCommand,
+		cmd.RawTCPCommand,
+		cmd.ZMQCommand,
 	)
 	if err := root.Execute(); err != nil {
 		panic(err)

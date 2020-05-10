@@ -1,7 +1,10 @@
 package helpers
 
-func Panicer(err error) {
-	if err != nil {
-		panic(err)
+func Panicer(errs ...interface{}) {
+	for _, err := range errs {
+		terr, ok := err.(error)
+		if ok && terr != nil {
+			panic(terr)
+		}
 	}
 }
