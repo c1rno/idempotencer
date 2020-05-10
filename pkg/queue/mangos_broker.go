@@ -1,12 +1,14 @@
 package queue
 
 import (
-	"sync"
 	"context"
+	"sync"
+
 	"github.com/c1rno/idempotencer/pkg/errors"
 	"github.com/c1rno/idempotencer/pkg/helpers"
 	"github.com/c1rno/idempotencer/pkg/logging"
 	"go.nanomsg.org/mangos/v3"
+	"go.nanomsg.org/mangos/v3/protocol"
 	"go.nanomsg.org/mangos/v3/protocol/rep"
 	_ "go.nanomsg.org/mangos/v3/transport/all"
 )
@@ -18,12 +20,12 @@ const (
 func NewMangosBroker(conf BrokerConfig, logger logging.Logger) Broker {
 	ctx, done := context.WithCancel(context.Background())
 	return &mangosLoadBalancer{
-		conf: conf,
-		log:  logger,
-		wg: sync.WaitGroup{},
-		ctx: ctx,
-		done: done,
-		upConns: map[uint32]*conn{},
+		conf:      conf,
+		log:       logger,
+		wg:        sync.WaitGroup{},
+		ctx:       ctx,
+		done:      done,
+		upConns:   map[uint32]*conn{},
 		downConns: map[uint32]*conn{},
 	}
 }
@@ -49,8 +51,14 @@ func (m *mangosLoadBalancer) Start() errors.Error {
 	if m.upstreamSock, err = rep.NewSocket(); err != nil {
 		return helpers.NewErrWithLog(m.log, errors.NewRouterSocketCreationFail, err)
 	}
+	if err = m.upstreamSock.SetOption(protocol.OptionBestEffort, true); err != nil {
+		return helpers.NewErrWithLog(m.log, errors.UnknownError, err)
+	}
 	if m.downstreamSock, err = rep.NewSocket(); err != nil {
 		return helpers.NewErrWithLog(m.log, errors.NewRouterSocketCreationFail, err)
+	}
+	if err = m.downstreamSock.SetOption(protocol.OptionBestEffort, true); err != nil {
+		return helpers.NewErrWithLog(m.log, errors.UnknownError, err)
 	}
 
 	if err = m.downstreamSock.Listen(proto + m.conf.OutSocket); err != nil {
@@ -86,10 +94,10 @@ func (m *mangosLoadBalancer) Stop() errors.Error {
 }
 
 func (m *mangosLoadBalancer) startRouting() errors.Error {
-	m.downstreamSock.SetPipeEventHook(func(e mangos.PipeEvent, p mangos.Pipe){
+	m.downstreamSock.SetPipeEventHook(func(e mangos.PipeEvent, p mangos.Pipe) {
 		m.log.Debug("Downstream hook fired", map[string]interface{}{
-			"event": e,
-			"id": p.ID(),
+			"event":   e,
+			"id":      p.ID(),
 			"address": p.Address(),
 		})
 		if e == mangos.PipeEventAttached {
@@ -105,10 +113,10 @@ func (m *mangosLoadBalancer) startRouting() errors.Error {
 			}
 		}
 	})
-	m.upstreamSock.SetPipeEventHook(func(e mangos.PipeEvent, p mangos.Pipe){
+	m.upstreamSock.SetPipeEventHook(func(e mangos.PipeEvent, p mangos.Pipe) {
 		m.log.Debug("Upstream hook fired", map[string]interface{}{
-			"event": e,
-			"id": p.ID(),
+			"event":   e,
+			"id":      p.ID(),
 			"address": p.Address(),
 		})
 		if e == mangos.PipeEventAttached {
@@ -132,14 +140,14 @@ type conn struct {
 	done     context.CancelFunc
 }
 
-func(c *conn) close() error {
+func (c *conn) close() error {
 	c.done()
 	return c.conn.Close()
 }
 
 func newConn(ctx context.Context, sock mangos.Socket) (*conn, error) {
 	var (
-		err error
+		err     error
 		connCtx mangos.Context
 	)
 	if connCtx, err = sock.OpenContext(); err != nil {
@@ -156,17 +164,17 @@ func upWorker(id uint32, m *mangosLoadBalancer) {
 		return
 	}
 	var (
-		err error
-		downConn *conn = nil
+		err        error
+		downConn   *conn = nil
 		downTarget uint32
-		msg *mangos.Message = nil
+		msg        *mangos.Message = nil
 	)
 	defer func() {
 		if downConn != nil {
 			downConn.targetID = 0
 		}
 	}()
-	LOOP:
+LOOP:
 	if upConn.ctx.Err() != nil {
 		return
 	}
@@ -183,7 +191,7 @@ func upWorker(id uint32, m *mangosLoadBalancer) {
 	upConn.targetID = downTarget
 	downConn.targetID = id
 	m.log.Info("Paired", map[string]interface{}{
-		"upstreamID": id,
+		"upstreamID":   id,
 		"downstreamID": downTarget,
 	})
 
@@ -203,14 +211,15 @@ func upWorker(id uint32, m *mangosLoadBalancer) {
 			m.log.Error("Fail to write downstream message", map[string]interface{}{
 				helpers.ErrField: errors.NewError(errors.UnknownError, err),
 			})
-			_ = upConn.conn.Send([]byte("broker: "+err.Error()))
+			_ = upConn.conn.Send([]byte("broker: " + err.Error()))
+			downConn = nil
 			goto LOOP
 		}
 		if _, err = downConn.conn.Recv(); err != nil {
 			m.log.Error("Fail to read downstream message", map[string]interface{}{
 				helpers.ErrField: errors.NewError(errors.UnknownError, err),
 			})
-			_ = upConn.conn.Send([]byte("broker: "+err.Error()))
+			_ = upConn.conn.Send([]byte("broker: " + err.Error()))
 		}
 		_ = upConn.conn.Send([]byte("OK"))
 

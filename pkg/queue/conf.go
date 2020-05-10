@@ -18,7 +18,7 @@ type ClientConfig struct {
 
 func (c ClientConfig) ToLoggerCtx() map[string]interface{} {
 	return map[string]interface{}{
-		"identity": c.Identity,
+		"identity":    c.Identity,
 		"destination": c.Socket,
 	}
 }

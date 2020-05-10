@@ -2,20 +2,21 @@ package queue
 
 import (
 	"bytes"
-	stdErrors "errors"
 	"encoding/json"
+	stdErrors "errors"
 
 	"github.com/c1rno/idempotencer/pkg/dto"
 	"github.com/c1rno/idempotencer/pkg/errors"
 	"github.com/c1rno/idempotencer/pkg/helpers"
 	"github.com/c1rno/idempotencer/pkg/logging"
 	"go.nanomsg.org/mangos/v3"
+	"go.nanomsg.org/mangos/v3/protocol"
 	"go.nanomsg.org/mangos/v3/protocol/req"
 	_ "go.nanomsg.org/mangos/v3/transport/all"
 )
 
 const (
-	msgSize = 1024
+	msgSize      = 1024
 	identityHead = "identity"
 )
 
@@ -50,6 +51,9 @@ func (m *mangosClient) Connect() errors.Error {
 	var err error
 	if m.sock, err = req.NewSocket(); err != nil {
 		return helpers.NewErrWithLog(m.log, errors.NewRouterSocketCreationFail, err)
+	}
+	if err = m.sock.SetOption(protocol.OptionBestEffort, true); err != nil {
+		return helpers.NewErrWithLog(m.log, errors.UnknownError, err)
 	}
 	if err = m.sock.Dial(proto + m.conf.Socket); err != nil {
 		return helpers.NewErrWithLog(m.log, errors.ConnectSocketFail, err)

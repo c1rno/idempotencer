@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	proto       = "tcp://"
-	unavailable = "resource temporarily unavailable"
+	proto          = "tcp://"
+	unavailable    = "resource temporarily unavailable"
 	incorrectState = "incorrect protocol state"
-	READY       = "\001" //  Signals worker is ready
+	READY          = "\001" //  Signals worker is ready
 )
 
 func NewBroker(conf BrokerConfig, logger logging.Logger) Broker {
